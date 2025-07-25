@@ -49,3 +49,71 @@ async def main():
 
 # Run the async main function
 asyncio.run(main())
+
+
+
+# import asyncio
+# from dotenv import load_dotenv
+# from langchain.chat_models import init_chat_model
+# from langchain.agents import create_react_agent, create_tool_calling_agent, AgentExecutor
+# from langchain_mcp_adapters.client import MultiServerMCPClient
+# from langchain import hub
+# from langchain.prompts import PromptTemplate
+
+# load_dotenv()
+
+# async def main():
+#     # Wrap client in async context to properly manage sessions
+#     client = MultiServerMCPClient({
+#     "DBTools": {
+#         "url": "http://127.0.0.1:8000/mcp",
+#         "transport": "streamable_http",
+#     }
+# })
+#     tools = await client.get_tools()
+
+#     tool_names = [tool.name for tool in tools]
+
+#     # 💬 Custom ReAct prompt with JSON enforcement
+#     prompt = PromptTemplate.from_template("""
+#     You are an intelligent assistant that can use tools to answer questions.
+
+#     When you decide to use a tool, always follow this format exactly:
+
+#     Action: <tool_name>
+#     Action Input: <JSON formatted input, matching the tool's parameters>
+
+#     Begin!
+
+#     Question: {input}
+#     {agent_scratchpad}
+#     """)
+
+#     # prompt = prompt_template.partial(tools=tools, tool_names=tool_names)
+
+#     # Initialize your LLM
+#     llm = init_chat_model("gemini-2.5-flash", model_provider="google_genai")
+
+#     # Create the ReAct agent
+#     # agent = create_react_agent(llm=llm, tools=tools, prompt=prompt)
+
+#     agent = create_tool_calling_agent(llm=llm, tools=tools, prompt=prompt)
+
+#     # Build executor
+#     agent_executor = AgentExecutor(
+#         agent=agent,
+#         tools=tools,
+#         verbose=True,
+#         handle_parsing_errors=True
+#     )
+
+#     # Proper call format for a ReAct agent: messages field
+#     result = await agent_executor.ainvoke({
+#         "input": "Return me the just the db name which can be helpful to run following query\n"
+#         "'Retrieve the distinct names of partners and their products where the delivery mode is 'Online' (case-insensitive) and the cost amount is greater than 1000.'"
+#     })
+
+#     print("Agent output:", result["output"])
+
+# if __name__ == "__main__":
+#     asyncio.run(main())
